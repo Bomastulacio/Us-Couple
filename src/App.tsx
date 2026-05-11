@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { signInAnonymously } from 'firebase/auth';
+import { auth } from './firebase';
 import { LoginScreen } from './components/LoginScreen';
 import { MainScreen } from './components/MainScreen';
 
@@ -7,6 +9,11 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    // Authenticate anonymously so we can securely access Firestore
+    signInAnonymously(auth).catch((error) => {
+      console.warn("Firebase Auth Error (mock mode expected):", error);
+    });
+
     const savedName = localStorage.getItem('nuestro_name');
     const savedCode = localStorage.getItem('nuestro_code');
     
@@ -24,8 +31,6 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('nuestro_name');
-    // We intentionally keep the code in localStorage or remove it?
-    // Let's remove both so they can switch easily
     localStorage.removeItem('nuestro_code');
     setUser(null);
   };

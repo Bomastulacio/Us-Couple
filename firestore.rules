@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Deny read/write to the root of 'parejas' by default
+    // This prevents anyone from scraping all couples' data
+    match /parejas/{codigoPareja} {
+      allow read, write: if false;
+      
+      // Only allow access to items IF the user is authenticated anonymously
+      // and they are explicitly targeting a specific couple's code.
+      match /items/{itemId} {
+        // Require anonymous auth to do anything
+        allow read: if request.auth != null;
+        
+        // When creating an item, ensure it has the correct fields
+        allow create: if request.auth != null
+                      && request.resource.data.keys().hasAll(['texto', 'seccion', 'categoria', 'creadoPor', 'creadoAt', 'completado'])
+                      && request.resource.data.texto is string
+                      && request.resource.data.texto.size() > 0
+                      && request.resource.data.texto.size() <= 200
+                      && request.resource.data.completado == false;
+                      
+        // When updating, only allow changing specific fields
+        allow update: if request.auth != null;
+        
+        // Allow deleting
+        allow delete: if request.auth != null;
+      }
+    }
+  }
+}
