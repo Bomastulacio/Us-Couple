@@ -19,7 +19,6 @@ interface MainScreenProps {
 export const MainScreen = ({ user, onLogout }: MainScreenProps) => {
   const [items, setItems] = useState<Item[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dynamicWords, setDynamicWords] = useState<string[]>([]);
 
   useEffect(() => {
     // We wrap this in try-catch in case Firebase is not configured properly yet
@@ -48,10 +47,6 @@ export const MainScreen = ({ user, onLogout }: MainScreenProps) => {
         });
 
         setItems(newItems);
-        
-        // Update dynamic words for background based on last items
-        const recentWords = newItems.slice(0, 8).map(item => item.texto.split(' ')[0]);
-        setDynamicWords(recentWords);
       });
 
       return () => unsubscribe();
